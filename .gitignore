@@ -1,0 +1,26 @@
+# Python cache and environments
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Local editor and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Webots local workspace state and generated world thumbnails
+*.wbproj
+/worlds/.*.jpg
+
+# Compiled artifacts
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Logs
+*.log
