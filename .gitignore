@@ -12,7 +12,6 @@ Thumbs.db
 
 # Webots local workspace state and generated world thumbnails
 *.wbproj
-/worlds/.*.jpg
 
 # Compiled artifacts
 *.o
