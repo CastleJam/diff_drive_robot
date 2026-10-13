@@ -44,6 +44,9 @@ Robot {
         RotationalMotor {
           name "motor_1"
         }
+        PositionSensor {
+          name "ps_1"
+        }
       ]
       endPoint Solid {
         translation 0.045 0 0.025
@@ -73,6 +76,9 @@ Robot {
       device [
         RotationalMotor {
           name "motor_2"
+        }
+        PositionSensor {
+          name "ps_2"
         }
       ]
       endPoint Solid {

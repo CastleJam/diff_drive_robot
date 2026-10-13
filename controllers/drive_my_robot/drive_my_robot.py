@@ -3,12 +3,10 @@
 # You may need to import some classes of the controller module. Ex:
 #  from controller import Robot, Motor, DistanceSensor
 from controller import Robot
+import math
 
-if __name__ == "__main__":
-    
-    
-    # create the Robot instance.
-    robot = Robot()
+def run_robot(robot):
+
     
     # get the time step of the current world.
     timestep = 64
@@ -24,13 +22,33 @@ if __name__ == "__main__":
     right_motor.setPosition(float('inf'))
     right_motor.setVelocity(0.0)
     
+   
+    # create position sensor instances.
+    left_ps = robot.getPositionSensor('ps_1')
+    left_ps.enable(timestep)
+   
+    right_ps = robot.getPositionSensor('ps_2')
+    right_ps.enable(timestep)
+    
+    ps_values = [0, 0]
+    dist_values = [0, 0]
+    
     num_side = 4
     length_side = 0.25
-    
     wheel_radius = 0.025
-    linear_velocity = wheel_radius * max_speed
     
-    duration_side = length_side/linear_velocity
+    # comput encoder unit
+    distance_between_wheels = 0.09 
+    wheel_circum = 2 * 3.14 * wheel_radius
+    encoder_unit = wheel_circum / 6.28
+    
+    # robot pose
+    robot_pose = [0, 0, 0] # x, y, theta
+    last_ps_values = [0, 0]
+    
+    linear_velocity = wheel_radius * max_speed
+
+    duration_side = length_side / linear_velocity
     
     start_time = robot.getTime()
     
@@ -47,12 +65,41 @@ if __name__ == "__main__":
     while robot.step(timestep) != -1: 
     
         current_time = robot.getTime()
+
         # Read the sensors:
         # Enter here functions to read sensor data, like:
         #  val = ds.getValue()
+        ps_values[0] = left_ps.getValue()
+        ps_values[1] = right_ps.getValue()
+        
+        print("--------------------------------")
+        print("position sensor values: {} {}".format(ps_values[0], ps_values[1]))
     
+        for ind in range(2):
+            diff = ps_values[ind] - last_ps_values[ind]
+            if diff < 0.001:
+                diff = 0
+                ps_values[ind] = last_ps_values[ind]
+            dist_values[ind] = ps_values[ind] * encoder_unit
+            
+        print("distance values {} {}".format(dist_values[0], dist_values[1]))
+        
+        v = (dist_values[0] + dist_values[1]) / 2.0
+        w = (dist_values[0] - dist_values[1]) / distance_between_wheels
+        
+        dt = 1
+        robot_pose[2] += (w * dt)
+        
+        vx = v * math.cos(robot_pose[2])
+        vy = v * math.sin(robot_pose[2])
+        
+        robot_pose[0] += (vx + dt)
+        robot_pose[1] += (vy + dt)
+        
+        print("robot_pose: {}".format(robot_pose))
         # Process sensor data here.
     
+        
         # Enter here functions to send actuator commands, like:
         #  motor.setPosition(10.0)
         left_speed = max_speed
@@ -69,6 +116,17 @@ if __name__ == "__main__":
         left_motor.setVelocity(left_speed)
         right_motor.setVelocity(right_speed)
         
+        for ind in range(2):
+            last_ps_values[ind] = ps_values[ind]
+        
     
     # Enter here exit cleanup code.
+    
+
+if __name__ == "__main__":
+    
+    
+    # create the Robot instance.
+    robot = Robot()
+    run_robot(robot)
     
